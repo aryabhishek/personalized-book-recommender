@@ -3,6 +3,7 @@ import { userModel } from "./db";
 import { hash, compare } from "bcrypt";
 import { sign, verify } from "jsonwebtoken";
 import { z } from "zod";
+import { askGemini, recommendBooks } from "./gemini";
 
 const app = express();
 const PORT = 3000;
@@ -87,6 +88,24 @@ app.post("/signin", async (req: Request, res: Response) => {
 app.get("/all-users", auth, async (req, res) => {
   const users = await userModel.find();
   res.json({ users });
+});
+
+app.get("/ask", async (req, res) => {
+  const query = req.query.q;
+  //@ts-ignore
+  const response = await askGemini(query);
+  res.send(response);
+});
+
+app.get("/books", async (req, res) => {
+  const userPreferences = [
+    "genre: Crime, Mystery, Suspense",
+    "writing-style: fast-paced"
+  ]
+  const bookRecommendations = await recommendBooks(userPreferences.toString(), 10);
+  res.json({
+    bookRecommendations,
+  });
 });
 
 app.listen(PORT, () => {
