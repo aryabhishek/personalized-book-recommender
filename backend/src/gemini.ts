@@ -38,8 +38,8 @@ export async function recommendBooks(userPreferences: string, n: number = 5) {
   Only return a json array.
   Example JSON output: 
   [
-    {"title": "Book Title 1", "author": "Author 1", "description": "description of the book"},
-    {"title": "Book Title 2", "author": "Author 2", "description": "description of the book"}
+    {"title": "Book Title 1", "author": "Author 1", "description": "description of the book", "genre": "genre of the book"},
+    {"title": "Book Title 2", "author": "Author 2", "description": "description of the book", "genre": "genre of the book"}
   ]
   Recommendations:
 `;

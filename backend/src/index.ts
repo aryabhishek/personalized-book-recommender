@@ -97,18 +97,21 @@ app.get("/ask", async (req, res) => {
   res.send(response);
 });
 
-app.get("/books", async (req, res) => {
-  const userPreferences = [
-    "genre: Crime, Mystery, Suspense",
-    "writing-style: fast-paced",
-  ];
-  const bookRecommendations = await recommendBooks(
-    userPreferences.toString(),
-    10
-  );
-  res.json({
-    bookRecommendations,
+app.get("/books", auth, async (req, res) => {
+  const username = req.headers.username;
+  const userPreferences = await userPreferencesModel.findOne({
+    username: username,
+    //@ts-ignore
   });
+  if (userPreferences) {
+    const bookRecommendations = await recommendBooks(
+      userPreferences.pref.toString(),
+      10
+    );
+    res.json({
+      bookRecommendations,
+    });
+  }
 });
 
 app.post("/pref", auth, async (req, res) => {
@@ -127,17 +130,17 @@ app.post("/pref", auth, async (req, res) => {
   });
 
   if (prefUser) {
-    await userPreferencesModel.updateOne({
-      where: {
-        username: req.headers.username,
-      },
-      $set: {
-        pref: preferences,
-      },
-    });
+    await userPreferencesModel.updateOne(
+      { username: req.headers.username },
+      {
+        $set: {
+          pref: preferences,
+        },
+      }
+    );
     res.status(200).json({
       message: "Preference udpated successfully.",
-      pref: preferences
+      pref: prefUser.pref,
     });
     return;
   }
@@ -147,7 +150,7 @@ app.post("/pref", auth, async (req, res) => {
   });
   res.status(200).json({
     message: "Preference added successfully.",
-    pref: preferences
+    pref: preferences,
   });
 });
 
