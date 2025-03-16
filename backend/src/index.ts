@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
-import { userModel } from "./db";
+import { userModel, userPreferencesModel } from "./db";
 import { hash, compare } from "bcrypt";
 import { sign, verify } from "jsonwebtoken";
 import { z } from "zod";
@@ -45,7 +45,7 @@ function auth(req: Request, res: Response, next: NextFunction) {
 
   try {
     const decoded = verify(token, SECRET) as { username: string };
-    (req as any).username = decoded.username;
+    req.headers["username"] = decoded.username;
     next();
   } catch (error) {
     res.status(401).json({ message: "Invalid or expired token!" });
@@ -100,11 +100,54 @@ app.get("/ask", async (req, res) => {
 app.get("/books", async (req, res) => {
   const userPreferences = [
     "genre: Crime, Mystery, Suspense",
-    "writing-style: fast-paced"
-  ]
-  const bookRecommendations = await recommendBooks(userPreferences.toString(), 10);
+    "writing-style: fast-paced",
+  ];
+  const bookRecommendations = await recommendBooks(
+    userPreferences.toString(),
+    10
+  );
   res.json({
     bookRecommendations,
+  });
+});
+
+app.post("/pref", auth, async (req, res) => {
+  const preferences: [String] = req.body.pref;
+  const user = await userModel.findOne({
+    username: req.headers.username,
+  });
+  if (!user) {
+    res.status(404).json({
+      message: "User doesn't exist!",
+    });
+    return;
+  }
+  const prefUser = await userPreferencesModel.findOne({
+    username: req.headers.username,
+  });
+
+  if (prefUser) {
+    await userPreferencesModel.updateOne({
+      where: {
+        username: req.headers.username,
+      },
+      $set: {
+        pref: preferences,
+      },
+    });
+    res.status(200).json({
+      message: "Preference udpated successfully.",
+      pref: preferences
+    });
+    return;
+  }
+  await userPreferencesModel.create({
+    username: req.headers.username,
+    pref: preferences,
+  });
+  res.status(200).json({
+    message: "Preference added successfully.",
+    pref: preferences
   });
 });
 

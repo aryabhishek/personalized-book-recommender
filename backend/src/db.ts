@@ -9,6 +9,12 @@ const userSchema = new Schema({
   lname: String,
 });
 
-const userModel = model("User", userSchema);
+const userPreferencesSchema = new Schema({
+  username: String,
+  pref: [String]
+})
 
-export { userModel };
+const userModel = model("User", userSchema);
+const userPreferencesModel = model("Pref", userPreferencesSchema);
+
+export { userModel, userPreferencesModel };
