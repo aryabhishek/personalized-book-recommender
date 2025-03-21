@@ -45,7 +45,7 @@ export default function Dashboard() {
   //   {
   //     title: 'The Lord of the Rings',
   //     author: 'J.R.R. Tolkien',
-  //     imageUrl: "https://www.framecaplib.com/lotrlib/images/hauj/hauj0003.jpg",
+  //     imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROXcRkMBWPAQHM1il6uE4VDvXCmvnef2op1w&s",
   //     description: "He is the man the myth the legend"
   //   },
   //   {
@@ -76,7 +76,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div>
+    <div className='dark:bg-[#121212] dark:text-white'>
       <Grid2 container justifyContent="center">
         {books.map((book, index) => (
           //@ts-ignore

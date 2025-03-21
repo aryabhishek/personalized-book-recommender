@@ -22,7 +22,11 @@ export default function Preferences() {
     animation: false,
     crime: false,
     musical: false,
-    historical: false
+    historical: false,
+    religious: false,
+    financial: false,
+    "self-help": false,
+    detective: false
   });
   const navigate = useNavigate();
 
