@@ -4,6 +4,7 @@ import { hash, compare } from "bcrypt";
 import { sign, verify } from "jsonwebtoken";
 import { z } from "zod";
 import { askGemini, recommendBooks } from "./gemini";
+import cors from "cors"
 
 const app = express();
 const PORT = 3000;
@@ -11,6 +12,7 @@ const SALT = 5;
 const SECRET = "Thisisconfidentialinformation";
 
 app.use(express.json());
+app.use(cors());
 
 function generateToken(username: string) {
   return sign({ username }, SECRET);
