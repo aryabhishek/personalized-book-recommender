@@ -184,7 +184,7 @@ app.get("/test", async (req, res) => {
       book
     })
   }
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

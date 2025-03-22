@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 const BACKEND_URL = "http://localhost:3000"
 
 export default function Dashboard() {
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState<Array<Map<string, string>>>([]);
 
   // const books = [
   //   {
@@ -24,7 +24,7 @@ export default function Dashboard() {
   //     title: 'The Lord of the Rings',
   //     author: 'J.R.R. Tolkien',
   //     imageUrl: "https://www.framecaplib.com/lotrlib/images/hauj/hauj0003.jpg",
-  //     description: "He is the man the myth the legend"
+  //     description: "New Yorkers are facing the winter chill with less warmth this year as the city's most revered soup stand unexpectedly shutters, following a series of events that have left the community puzzled."
   //   },
   //   {
   //     title: 'Pride and Prejudice',
@@ -62,11 +62,33 @@ export default function Dashboard() {
         "Authorization": localStorage.getItem("token")
       }
     });
-    setBooks(response.data.bookRecommendations);
+    const resArr = response.data.bookRecommendations;
+    //@ts-ignore
+    let tempArray: [Map<string, string>] = [];
+
+    for (let i = 0; i < resArr.length; i++) {
+      const tempMap: Map<string, string> = new Map<string, string>(Object.entries(resArr[i]));
+      tempArray.push(tempMap);
+    }
+    setBooks(tempArray);
+  }
+
+  function getBookData() {
+    books.forEach((book: any) => {
+      book.setItem("imageUrl","https://www.designforwriters.com/wp-content/uploads/2017/10/design-for-writers-book-cover-tf-2-a-million-to-one.jpg" );
+      console.log(book.getItem("imageUrl"));
+    })
+  };
+
+  async function promisifiedTimeout() {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   }
 
   useEffect(() => {
     getBooks();
+    promisifiedTimeout();
+    getBookData();
+
   }, [])
 
   if (books.length === 0) {
@@ -76,11 +98,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className='dark:bg-[#121212] dark:text-white'>
+    <div className='dark:bg-[#121212] dark:text-white min-h-screen w-screen text-wrap'>
       <Grid2 container justifyContent="center">
         {books.map((book, index) => (
           //@ts-ignore
-          <Grid2 item key={index}>
+          <Grid2 key={index}>
             <BookCard book={book} />
           </Grid2>
         ))}
