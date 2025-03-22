@@ -5,6 +5,7 @@ import { sign, verify } from "jsonwebtoken";
 import { z } from "zod";
 import { askGemini, recommendBooks } from "./gemini";
 import cors from "cors"
+import { searchBook } from "./booksApi";
 
 const app = express();
 const PORT = 3000;
@@ -155,6 +156,35 @@ app.post("/pref", auth, async (req, res) => {
     pref: preferences,
   });
 });
+
+app.get("/test", async (req, res) => {
+  const title: string = req.body.title;
+  const author: string = req.body.author;
+  const book = await searchBook(title, author);
+  try {
+  //@ts-ignore
+  const volumeInfo = book[0].volumeInfo;
+  const isbn = volumeInfo.industryIdentifiers[1].identifier;
+  const pages = volumeInfo.pageCount;
+  const categories = volumeInfo.categories;
+  const avgRating = volumeInfo.averageRating;
+  const ratingCount = volumeInfo.ratingCount;
+  // const thumbnail = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+  const thumbnail = volumeInfo.imageLinks.thumbnail.replace(/zoom=[0-9]+/, "zoom=3");
+  res.json({
+    isbn,
+    pages,
+    categories,
+    avgRating,
+    ratingCount,
+    thumbnail
+  })
+  } catch (err) {
+    res.json({
+      book
+    })
+  }
+})
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
